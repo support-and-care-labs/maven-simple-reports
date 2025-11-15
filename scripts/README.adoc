@@ -30,8 +30,9 @@ export GH_TOKEN=your_github_token_here
 This will:
 
 1. Fetch all open PRs from ~62 Apache Maven repositories
-2. Extract build status and build URLs from CI/CD checks
-3. Export to CSV file at `/tmp/maven_open_prs.csv`
+2. Extract overall build status from all CI/CD checks (GitHub Actions, Jenkins, etc.)
+3. Generate links to GitHub PR checks pages showing all build results
+4. Export to CSV file at `/tmp/maven_open_prs.csv`
 
 ==== AsciiDoc Output
 
@@ -84,8 +85,8 @@ Shows only PRs created by DependaBot (author: `app/dependabot`)
 * Created - Creation date (YYYY-MM-DD)
 * Updated - Last update date (YYYY-MM-DD)
 * Draft - Whether PR is in draft state (Yes/No)
-* Build Status - CI/CD build status (SUCCESS, FAILURE, PENDING, UNKNOWN, etc.)
-* Build URL - Direct link to build results
+* Build Status - Overall CI/CD build status from all checks (SUCCESS, FAILURE, PENDING, UNKNOWN)
+* Build URL - Link to GitHub PR checks page showing all build results (GitHub Actions, Jenkins, etc.)
 * Labels - Comma-separated list of PR labels
 * PR URL - Link to the pull request
 
@@ -95,7 +96,7 @@ The AsciiDoc format generates a table with the following columns:
 
 * Title - PR title
 * Date - Creation date (ISO 8601 format)
-* Build Status - CI/CD status with clickable link to build results
+* Build Status - Overall CI/CD status with clickable link to GitHub checks page (showing all GitHub Actions, Jenkins, and other checks)
 * Id - PR number with link to the PR
 
 PRs are grouped by repository, with repository names as clickable links to the repository's pull requests page. PRs within each repository are sorted by creation date (newest first).

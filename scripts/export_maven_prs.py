@@ -138,44 +138,43 @@ def get_prs_for_repo(repo):
         return []
 
 def get_build_status(pr):
-    """Extract build status from PR's statusCheckRollup"""
+    """Extract build status from PR's statusCheckRollup and return checks page URL"""
     rollup = pr.get('statusCheckRollup')
 
+    # Construct GitHub PR checks page URL
+    repo_name = pr['repository']['name']
+    pr_number = pr['number']
+    checks_url = f'https://github.com/apache/{repo_name}/pull/{pr_number}/checks'
+
     if not rollup:
-        return 'UNKNOWN', ''
+        return 'UNKNOWN', checks_url
 
-    # Get overall state
+    # Get overall state from all checks
     state = 'UNKNOWN'
-    build_url = ''
+    has_failure = False
+    has_pending = False
+    has_success = False
 
-    # Check for combined status
+    # Check for combined status across all contexts
     for context in rollup:
-        context_name = context.get('context', '')
         context_state = context.get('state', context.get('conclusion', 'UNKNOWN'))
-        context_url = context.get('targetUrl', '')
 
-        # Prioritize CI/Jenkins/GitHub Actions statuses
-        if any(ci in context_name.lower() for ci in ['jenkins', 'ci/', 'github-actions', 'build']):
-            if context_state in ['SUCCESS', 'SUCCESSFUL', 'COMPLETED']:
-                if state != 'FAILURE':  # Don't override failure
-                    state = 'SUCCESS'
-                    if not build_url:
-                        build_url = context_url
-            elif context_state in ['FAILURE', 'FAILED', 'ERROR']:
-                state = 'FAILURE'
-                build_url = context_url
-            elif context_state in ['PENDING', 'IN_PROGRESS']:
-                if state not in ['FAILURE', 'SUCCESS']:
-                    state = 'PENDING'
-                    if not build_url:
-                        build_url = context_url
+        if context_state in ['FAILURE', 'FAILED', 'ERROR']:
+            has_failure = True
+        elif context_state in ['PENDING', 'IN_PROGRESS', 'WAITING', 'QUEUED']:
+            has_pending = True
+        elif context_state in ['SUCCESS', 'SUCCESSFUL', 'COMPLETED']:
+            has_success = True
 
-        # Fallback to any status
-        if state == 'UNKNOWN' and context_state:
-            state = context_state
-            build_url = context_url
+    # Determine overall state (failure takes precedence, then pending, then success)
+    if has_failure:
+        state = 'FAILURE'
+    elif has_pending:
+        state = 'PENDING'
+    elif has_success:
+        state = 'SUCCESS'
 
-    return state, build_url
+    return state, checks_url
 
 def get_all_maven_prs():
     """Get all open PRs from Maven repositories"""
