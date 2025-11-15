@@ -1,6 +1,22 @@
-= Maven MCP Scripts
+//
+// Copyright 2025 The Apache Software Foundation
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 
-This directory contains utility scripts for the Maven MCP project.
+= Maven Simple Reports
+
+This repository contains utility scripts for generating reports about Apache Maven repositories.
 
 == export_maven_prs.py
 
@@ -24,7 +40,7 @@ export GH_TOKEN=your_github_token_here
 
 [source,bash]
 ----
-./scripts/export_maven_prs.py
+scripts/export_maven_prs.py
 ----
 
 This will:
@@ -38,7 +54,7 @@ This will:
 
 [source,bash]
 ----
-./scripts/export_maven_prs.py --format asciidoc
+scripts/export_maven_prs.py --format asciidoc
 ----
 
 Exports to AsciiDoc format at `/tmp/maven_open_prs.adoc`
@@ -47,15 +63,15 @@ Exports to AsciiDoc format at `/tmp/maven_open_prs.adoc`
 
 [source,bash]
 ----
-./scripts/export_maven_prs.py --format csv --output /path/to/output.csv
-./scripts/export_maven_prs.py --format asciidoc -o /path/to/output.adoc
+scripts/export_maven_prs.py --format csv --output /path/to/output.csv
+scripts/export_maven_prs.py --format asciidoc -o /path/to/output.adoc
 ----
 
 ==== Filter DependaBot PRs Only
 
 [source,bash]
 ----
-./scripts/export_maven_prs.py --dependabot --format asciidoc
+scripts/export_maven_prs.py --dependabot --format asciidoc
 ----
 
 Shows only PRs created by DependaBot (author: `app/dependabot`)
@@ -64,7 +80,7 @@ Shows only PRs created by DependaBot (author: `app/dependabot`)
 
 [source,bash]
 ----
-./scripts/export_maven_prs.py --author "someuser"
+scripts/export_maven_prs.py --author "someuser"
 ----
 
 ==== Command-line Options
