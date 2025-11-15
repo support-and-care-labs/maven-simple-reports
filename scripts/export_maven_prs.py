@@ -252,7 +252,7 @@ def export_to_csv(prs, filename='/tmp/maven_open_prs.csv'):
 
     return filename
 
-def export_to_asciidoc(prs, filename='/tmp/maven_open_prs.adoc'):
+def export_to_asciidoc(prs, filename='/tmp/maven_open_prs.adoc', title='Open Maven PRs'):
     """Export PRs to AsciiDoc file"""
     # Group PRs by repository
     repos = {}
@@ -268,7 +268,7 @@ def export_to_asciidoc(prs, filename='/tmp/maven_open_prs.adoc'):
     with open(filename, 'w', encoding='utf-8') as f:
         # Write header
         now = datetime.now().strftime('%a %b %d %H:%M:%S %Z %Y')
-        f.write('= Open Maven PRs\n\n')
+        f.write(f'= {title}\n\n')
         f.write(f'The following Apache Maven projects have open Pull-Requests as of {now}.\n\n')
         f.write('[cols="8,3,2,1", options="header"]\n')
         f.write('|===\n')
@@ -417,7 +417,9 @@ if __name__ == '__main__':
 
     # Export in requested format
     if args.format == 'asciidoc':
-        filename = export_to_asciidoc(prs, output_file)
+        # Set title based on filter
+        title = 'Open Maven Dependabot PRs' if args.dependabot else 'Open Maven PRs'
+        filename = export_to_asciidoc(prs, output_file, title=title)
         print(f"Exported AsciiDoc to: {filename}\n", file=sys.stderr)
     else:
         filename = export_to_csv(prs, output_file)
