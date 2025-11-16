@@ -50,8 +50,22 @@ jobs:
           chmod +x scripts/generate_report.sh
           scripts/generate_report.sh
 
+      - name: Set Netlify alias
+        if: github.ref != 'refs/heads/main'
+        id: netlify-alias
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "alias=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          else
+            # Use branch name, sanitize it for Netlify (replace / with -)
+            BRANCH_NAME="${{ github.ref_name }}"
+            SANITIZED_BRANCH=$(echo "$BRANCH_NAME" | sed 's/\//-/g')
+            echo "alias=$SANITIZED_BRANCH" >> $GITHUB_OUTPUT
+          fi
+
       - name: Deploy to Netlify (branches and PRs)
         if: github.ref != 'refs/heads/main'
+        id: netlify-deploy
         uses: nwtgck/actions-netlify@v2
         with:
           publish-dir: './public'
@@ -60,6 +74,7 @@ jobs:
           deploy-message: "Deploy from GitHub Actions - ${{ github.event.head_commit.message || github.event.pull_request.title }}"
           enable-pull-request-comment: true
           enable-commit-comment: false
+          alias: ${{ steps.netlify-alias.outputs.alias }}
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
