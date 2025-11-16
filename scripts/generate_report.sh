@@ -25,7 +25,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 mkdir -p "${REPO_ROOT}/public"
 
 # Run the export script
-echo "Generating DependaBot PR report..."
+echo "Generating Dependabot PR report..."
 "${SCRIPT_DIR}/export_maven_prs.py" \
     --format asciidoc \
     --dependabot \

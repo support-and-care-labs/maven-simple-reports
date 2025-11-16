@@ -20,4 +20,4 @@ This site contains reports about Apache Maven repositories.
 
 == Available Reports
 
-* xref:dependabot-prs.adoc[DependaBot Pull Requests] - All open DependaBot PRs across Maven repositories
+* xref:dependabot-prs.adoc[Dependabot Pull Requests] - All open Dependabot PRs across Maven repositories
