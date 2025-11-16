@@ -137,7 +137,7 @@ def get_prs_for_repo(repo):
         'gh', 'pr', 'list',
         '--repo', f'apache/{repo}',
         '--state', 'open',
-        '--json', 'number,title,author,createdAt,updatedAt,url,isDraft,labels,headRefOid,statusCheckRollup',
+        '--json', 'number,title,author,createdAt,updatedAt,url,isDraft,labels,headRefOid,statusCheckRollup,mergeable',
         '--limit', '1000'
     ]
 
@@ -153,13 +153,19 @@ def get_prs_for_repo(repo):
         return []
 
 def get_build_status(pr):
-    """Extract build status from PR's statusCheckRollup and return checks page URL"""
+    """Extract build status from PR's statusCheckRollup and return appropriate URL"""
     rollup = pr.get('statusCheckRollup')
 
-    # Construct GitHub PR checks page URL
+    # Construct GitHub PR URLs
     repo_name = pr['repository']['name']
     pr_number = pr['number']
+    pr_url = pr['url']
     checks_url = f'https://github.com/apache/{repo_name}/pull/{pr_number}/checks'
+
+    # Check for merge conflicts first - link to PR page which shows conflict banner
+    mergeable = pr.get('mergeable')
+    if mergeable == 'CONFLICTING':
+        return 'CONFLICT', pr_url
 
     if not rollup:
         return 'UNKNOWN', checks_url
