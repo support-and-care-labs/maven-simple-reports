@@ -315,19 +315,21 @@ def gh_check_repo_archived(repo):
     """Return True if github repo apache/<repo> is archived. Uses 'gh' CLI."""
     try:
         result = subprocess.run(
-            ['gh', 'repo', 'view', f'apache/{repo}', '--json', 'archived'],
+            ['gh', 'repo', 'view', f'apache/{repo}', '--json', 'isArchived'],
             capture_output=True,
             text=True,
             check=True
         )
         data = json.loads(result.stdout)
-        return bool(data.get('archived', False))
+        return bool(data.get('isArchived', False))
     except FileNotFoundError:
         print("Warning: 'gh' CLI not found; skipping archived checks.", file=sys.stderr)
         return False
-    except subprocess.CalledProcessError:
-        # Could be permission or repo not found; treat as not archived to avoid accidental deletion
-        print(f"Warning: unable to fetch repo metadata for apache/{repo}; skipping archived check.", file=sys.stderr)
+    except subprocess.CalledProcessError as e:
+        # Could be permission, rate limit, or repo not found; treat as not archived to avoid accidental deletion
+        # Only warn if it's not a rate limit issue (status 403 or 429)
+        if 'rate limit' not in str(e).lower() and '403' not in str(e) and '429' not in str(e):
+            print(f"Warning: unable to fetch repo metadata for apache/{repo}; skipping archived check.", file=sys.stderr)
         return False
     except json.JSONDecodeError:
         print(f"Warning: unexpected response when checking apache/{repo}; skipping archived check.", file=sys.stderr)
